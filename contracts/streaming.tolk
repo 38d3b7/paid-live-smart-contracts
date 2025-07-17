@@ -1,5 +1,19 @@
+/// @title Streaming Payment Contract
+/// @notice This contract enables streaming TON payments with a commission.
+
 const min_tons_for_storage = 10000000; // ONE_TON / 100
 
+/**
+ * @notice Saves the internal contract state.
+ * @param ownerAddress The owner of the contract.
+ * @param commissionAddress Address that receives 4% commission.
+ * @param balance Total TON balance available for streaming.
+ * @param finalPay Pending unpaid amount if balance was insufficient.
+ * @param targetAddress Receiver of the streamed TON.
+ * @param streamingRate TON/second rate for streaming.
+ * @param lastUpdated Timestamp of last streaming update.
+ * @param payFlag 0 = not streaming, 1 = active streaming.
+ */
 @inline
 fun saveData(
     ownerAddress: address,
@@ -25,6 +39,10 @@ fun saveData(
     );
 }
 
+/**
+ * @notice Loads the internal contract state from storage.
+ * @return All contract parameters.
+ */
 @inline
 fun loadData(): (address, address, int, int, address, int, int, int) {
     var ds: slice = contract.getData().beginParse();
@@ -35,11 +53,18 @@ fun loadData(): (address, address, int, int, address, int, int, int) {
         ds.loadCoins(),       // finalPay
         ds.loadAddress(),     // targetAddress
         ds.loadCoins(),       // streamingRate
-        ds.loadUint(64),      // lastUpdated
-        ds.loadUint(4)        // payFlag
+        ds.loadUint(64),  // lastUpdated
+        ds.loadUint(4)    // payFlag
     );
 }
 
+/**
+ * @notice Sends TON to a recipient and commission to a second address.
+ * @param toAddress Main recipient.
+ * @param commissionAddress Commission receiver.
+ * @param amount Total amount to be split.
+ * @param sendMode Send mode flags.
+ */
 @inline
 fun sendTon(toAddress: address, commissionAddress: address, amount: int, sendMode: int) {
     var commissionAmount: int = amount * 4 / 100;
@@ -64,6 +89,13 @@ fun sendTon(toAddress: address, commissionAddress: address, amount: int, sendMod
     sendRawMessage(msg1, sendMode);
 }
 
+/**
+ * @notice Handles incoming internal messages and processes commands.
+ * @dev Includes commands for configuration, starting/stopping streaming, and balance top-up.
+ * @param msgValue Amount of TON received with message.
+ * @param inMsgFull Entire message cell.
+ * @param inMsgBody Payload slice (command + params).
+ */
 fun onInternalMessage(msgValue: int, inMsgFull: cell, inMsgBody: slice) {
     if (inMsgBody.isEmpty()) {
         return;
@@ -154,11 +186,19 @@ fun onInternalMessage(msgValue: int, inMsgFull: cell, inMsgBody: slice) {
     return;
 }
 
+/**
+ * @notice Calculates amount available to stream since last update.
+ * @return Available amount in TON.
+ */
 get fun get_streaming_info(): int {
     var (_, _, balance, _, _, rate, last, flag) = loadData();
     return rate * (blockchain.now() - last) / 60;
 }
 
+/**
+ * @notice Returns full contract configuration and state.
+ * @return Tuple of all state variables.
+ */
 get fun get_config(): (address, address, int, int, address, int, int, int) {
     return loadData();
 }

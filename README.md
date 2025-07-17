@@ -1,5 +1,7 @@
 # paid-live-smart-contracts
 
+This smart contract allows continuous streaming of TON payments from an owner to a designated target address at a specified rate. A commission is automatically split to a configured commission address. The contract supports operations such as starting/stopping the stream, adjusting settings, and handling edge cases like underpayment.
+
 ## Project structure
 
 -   `contracts` - source code of all the smart contracts of the project and their dependencies.
