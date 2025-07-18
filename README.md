@@ -2,6 +2,18 @@
 
 This smart contract allows continuous streaming of TON payments from an owner to a designated target address at a specified rate. A commission is automatically split to a configured commission address. The contract supports operations such as starting/stopping the stream, adjusting settings, and handling edge cases like underpayment.
 
+## Technologies I Used
+
+- **TON Blockchain** - L1 blockchain;
+- **Tolk Language** - smart contract language for the TVM;
+- **toncli** - deployment and interaction;
+
+## Challenges I ran into
+
+- **Understanding the TVM execution model** - unlike EVM’s synchronous calls, TVM uses asynchronous message passing. Coming from the EVM-based development field and adapting to this model required a lot of rethinking of the various concepts;
+- **Precise low-level data serialisation** - working with `beginCell()` and manual `.store...()` methods meant paying close attention to data layout. A single mismatch could silently corrupt contract behaviour;
+- **Ensuring safe state updates amidst partial failures** - I had to account for bounced messages, interrupted payments, or underfunded transfers to avoid inconsistent contract state, especially around streaming stop events.
+
 ## Project structure
 
 -   `contracts` - source code of all the smart contracts of the project and their dependencies.
