@@ -7,6 +7,7 @@ This smart contract allows continuous streaming of TON payments from an owner to
 - **TON Blockchain** - L1 blockchain;
 - **Tolk Language** - smart contract language for the TVM;
 - **toncli** - deployment and interaction;
+- [**TON MVP Repository**](https://github.com/38d3b7/paid-live-mvp/tree/main) - Streaming Mini App + Bot;
 
 ## Challenges I ran into
 
